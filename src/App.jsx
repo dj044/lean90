@@ -31,6 +31,11 @@ function round1(n) {
   return Math.round(n * 10) / 10;
 }
 
+function youtubeSearchUrl(query) {
+  const q = `${query} proper form`;
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+}
+
 /** ---------- Body Fat (US Navy) ---------- */
 function navyBodyFat({ sex, heightCm, neckCm, waistCm, hipCm }) {
   const toIn = (cm) => cm / 2.54;
@@ -42,12 +47,10 @@ function navyBodyFat({ sex, heightCm, neckCm, waistCm, hipCm }) {
   const log10 = (x) => Math.log(x) / Math.LN10;
 
   if (sex === "male") {
-    // 86.010 * log10(waist - neck) - 70.041 * log10(height) + 36.76
     const val =
-      86.010 * log10(Math.max(w - n, 0.1)) - 70.041 * log10(h) + 36.76;
+      86.01 * log10(Math.max(w - n, 0.1)) - 70.041 * log10(h) + 36.76;
     return clamp(val, 2, 60);
   } else {
-    // 163.205 * log10(waist + hip - neck) - 97.684 * log10(height) - 78.387
     const val =
       163.205 * log10(Math.max(w + hip - n, 0.1)) -
       97.684 * log10(h) -
@@ -58,7 +61,7 @@ function navyBodyFat({ sex, heightCm, neckCm, waistCm, hipCm }) {
 
 /** ---------- Program Engine ---------- */
 function phaseForDayIndex(dayIndex) {
-  const week = Math.floor(dayIndex / 7) + 1; // 1-based
+  const week = Math.floor(dayIndex / 7) + 1;
   if (week <= 4) return { name: "Foundation", calories: 2700 };
   if (week <= 8) return { name: "Hypertrophy", calories: 2800 };
   return { name: "Recomp", calories: 2600 };
@@ -98,12 +101,12 @@ function workoutTemplate(splitKey, phaseName) {
       return {
         title: "Chest + Triceps",
         blocks: [
-          { name: "Barbell Bench Press", sets: mainRep },
-          { name: "Incline Dumbbell Press", sets: auxRep },
-          { name: "Machine Chest Press", sets: auxRep },
-          { name: "Cable Fly", sets: isoRep },
-          { name: `Tricep Pushdown${supersetTag}`, sets: isoRep },
-          { name: `Overhead Tricep Extension${supersetTag}`, sets: isoRep },
+          { name: "Barbell Bench Press", sets: mainRep, videoUrl: youtubeSearchUrl("Barbell Bench Press") },
+          { name: "Incline Dumbbell Press", sets: auxRep, videoUrl: youtubeSearchUrl("Incline Dumbbell Press") },
+          { name: "Machine Chest Press", sets: auxRep, videoUrl: youtubeSearchUrl("Machine Chest Press") },
+          { name: "Cable Fly", sets: isoRep, videoUrl: youtubeSearchUrl("Cable Fly") },
+          { name: `Tricep Pushdown${supersetTag}`, sets: isoRep, videoUrl: youtubeSearchUrl("Tricep Pushdown") },
+          { name: `Overhead Tricep Extension${supersetTag}`, sets: isoRep, videoUrl: youtubeSearchUrl("Overhead Tricep Extension") },
         ],
         notes: commonNotes,
       };
@@ -112,12 +115,12 @@ function workoutTemplate(splitKey, phaseName) {
       return {
         title: "Back + Biceps",
         blocks: [
-          { name: "Pull-ups (assisted if needed)", sets: strengthBias ? "4×6–8" : "4×8–10" },
-          { name: "Barbell Row", sets: mainRep },
-          { name: "Lat Pulldown", sets: auxRep },
-          { name: "Seated Cable Row", sets: auxRep },
-          { name: `Hammer Curl${supersetTag}`, sets: isoRep },
-          { name: `Barbell Curl${supersetTag}`, sets: isoRep },
+          { name: "Pull-ups (assisted if needed)", sets: strengthBias ? "4×6–8" : "4×8–10", videoUrl: youtubeSearchUrl("Pull Up") },
+          { name: "Barbell Row", sets: mainRep, videoUrl: youtubeSearchUrl("Barbell Row") },
+          { name: "Lat Pulldown", sets: auxRep, videoUrl: youtubeSearchUrl("Lat Pulldown") },
+          { name: "Seated Cable Row", sets: auxRep, videoUrl: youtubeSearchUrl("Seated Cable Row") },
+          { name: `Hammer Curl${supersetTag}`, sets: isoRep, videoUrl: youtubeSearchUrl("Hammer Curl") },
+          { name: `Barbell Curl${supersetTag}`, sets: isoRep, videoUrl: youtubeSearchUrl("Barbell Curl") },
         ],
         notes: commonNotes,
       };
@@ -126,12 +129,12 @@ function workoutTemplate(splitKey, phaseName) {
       return {
         title: "Legs",
         blocks: [
-          { name: "Back Squat", sets: mainRep },
-          { name: "Romanian Deadlift", sets: auxRep },
-          { name: "Leg Press", sets: volumeBias ? "4×12" : "3×12" },
-          { name: "Walking Lunges", sets: "3×20 steps" },
-          { name: "Leg Curl", sets: isoRep },
-          { name: "Standing Calf Raise", sets: volumeBias ? "5×12–15" : "4×15" },
+          { name: "Back Squat", sets: mainRep, videoUrl: youtubeSearchUrl("Back Squat") },
+          { name: "Romanian Deadlift", sets: auxRep, videoUrl: youtubeSearchUrl("Romanian Deadlift") },
+          { name: "Leg Press", sets: volumeBias ? "4×12" : "3×12", videoUrl: youtubeSearchUrl("Leg Press") },
+          { name: "Walking Lunges", sets: "3×20 steps", videoUrl: youtubeSearchUrl("Walking Lunge") },
+          { name: "Leg Curl", sets: isoRep, videoUrl: youtubeSearchUrl("Hamstring Curl machine") },
+          { name: "Standing Calf Raise", sets: volumeBias ? "5×12–15" : "4×15", videoUrl: youtubeSearchUrl("Standing Calf Raise") },
         ],
         notes: [...commonNotes, "Leg day: bump carbs by +40–60g (extra rice/sweet potato)."],
       };
@@ -140,12 +143,12 @@ function workoutTemplate(splitKey, phaseName) {
       return {
         title: "Shoulders + Abs",
         blocks: [
-          { name: "Overhead Press", sets: mainRep },
-          { name: "Lateral Raise", sets: volumeBias ? "5×12–15" : "4×12–15" },
-          { name: "Rear Delt Fly", sets: isoRep },
-          { name: "Face Pull", sets: "3×15–20" },
-          { name: `Hanging Leg Raise${supersetTag}`, sets: "3×12–15" },
-          { name: `Plank${supersetTag}`, sets: "3×45–60s" },
+          { name: "Overhead Press", sets: mainRep, videoUrl: youtubeSearchUrl("Overhead Press") },
+          { name: "Lateral Raise", sets: volumeBias ? "5×12–15" : "4×12–15", videoUrl: youtubeSearchUrl("Dumbbell Lateral Raise") },
+          { name: "Rear Delt Fly", sets: isoRep, videoUrl: youtubeSearchUrl("Rear Delt Fly") },
+          { name: "Face Pull", sets: "3×15–20", videoUrl: youtubeSearchUrl("Face Pull") },
+          { name: `Hanging Leg Raise${supersetTag}`, sets: "3×12–15", videoUrl: youtubeSearchUrl("Hanging Leg Raise") },
+          { name: `Plank${supersetTag}`, sets: "3×45–60s", videoUrl: youtubeSearchUrl("Plank") },
         ],
         notes: commonNotes,
       };
@@ -154,12 +157,12 @@ function workoutTemplate(splitKey, phaseName) {
       return {
         title: "Upper Strength + Arms",
         blocks: [
-          { name: "Deadlift (or Trap-bar)", sets: strengthBias ? "4×5" : volumeBias ? "3×5–6" : "3×5" },
-          { name: "Incline Bench Press", sets: strengthBias ? "4×6" : "3×8–10" },
-          { name: "Weighted Pull-up / Pulldown", sets: "3×6–8" },
-          { name: `Preacher Curl${supersetTag}`, sets: isoRep },
-          { name: `Close-grip Bench / Dips${supersetTag}`, sets: auxRep },
-          { name: `Lateral Raise Burnout${supersetTag}`, sets: "2×AMRAP" },
+          { name: "Deadlift (or Trap-bar)", sets: strengthBias ? "4×5" : volumeBias ? "3×5–6" : "3×5", videoUrl: youtubeSearchUrl("Deadlift") },
+          { name: "Incline Bench Press", sets: strengthBias ? "4×6" : "3×8–10", videoUrl: youtubeSearchUrl("Incline Bench Press") },
+          { name: "Weighted Pull-up / Pulldown", sets: "3×6–8", videoUrl: youtubeSearchUrl("Weighted Pull Up") },
+          { name: `Preacher Curl${supersetTag}`, sets: isoRep, videoUrl: youtubeSearchUrl("Preacher Curl") },
+          { name: `Close-grip Bench / Dips${supersetTag}`, sets: auxRep, videoUrl: youtubeSearchUrl("Close Grip Bench Press") },
+          { name: `Lateral Raise Burnout${supersetTag}`, sets: "2×AMRAP", videoUrl: youtubeSearchUrl("Lateral Raise burnout") },
         ],
         notes: commonNotes,
       };
@@ -168,11 +171,11 @@ function workoutTemplate(splitKey, phaseName) {
       return {
         title: "Conditioning + Core",
         blocks: [
-          { name: "Incline Walk or Bike", sets: recompBias ? "25–30 min" : "20 min" },
-          { name: "Cable Crunch", sets: "3×12–15" },
-          { name: "Russian Twist", sets: "3×20" },
-          { name: "Back Extension", sets: "3×12" },
-          { name: "Mobility (hips/shoulders)", sets: "10 min" },
+          { name: "Incline Walk or Bike", sets: recompBias ? "25–30 min" : "20 min", videoUrl: youtubeSearchUrl("Incline treadmill walk") },
+          { name: "Cable Crunch", sets: "3×12–15", videoUrl: youtubeSearchUrl("Cable Crunch") },
+          { name: "Russian Twist", sets: "3×20", videoUrl: youtubeSearchUrl("Russian Twist") },
+          { name: "Back Extension", sets: "3×12", videoUrl: youtubeSearchUrl("Back Extension") },
+          { name: "Mobility (hips/shoulders)", sets: "10 min", videoUrl: youtubeSearchUrl("Hip mobility routine") },
         ],
         notes: ["Keep this easy-moderate. You should finish fresher, not destroyed."],
       };
@@ -182,9 +185,9 @@ function workoutTemplate(splitKey, phaseName) {
       return {
         title: "Rest Day",
         blocks: [
-          { name: "Steps", sets: "7k–10k" },
-          { name: "Light stretch", sets: "10 min" },
-          { name: "Optional easy walk", sets: "20–30 min" },
+          { name: "Steps", sets: "7k–10k", videoUrl: youtubeSearchUrl("10 minute walk after dinner benefits") },
+          { name: "Light stretch", sets: "10 min", videoUrl: youtubeSearchUrl("Full body stretching routine 10 minutes") },
+          { name: "Optional easy walk", sets: "20–30 min", videoUrl: youtubeSearchUrl("Easy walking routine") },
         ],
         notes: ["Recovery builds muscle. Sleep 7.5–9 hrs."],
       };
@@ -193,7 +196,6 @@ function workoutTemplate(splitKey, phaseName) {
 
 function mealTemplate(phaseName, isLegDay) {
   const proteinTarget = 150;
-
   const baseCalories =
     phaseName === "Foundation" ? 2700 : phaseName === "Hypertrophy" ? 2800 : 2600;
 
@@ -228,20 +230,11 @@ function saveState(state) {
 
 function defaultState(todayIso) {
   return {
-    profile: {
-      name: "Daljeet",
-      sex: "male",
-      heightCm: 170,
-      weightKg: 70
-    },
+    profile: { name: "Daljeet", sex: "male", heightCm: 170, weightKg: 70 },
     startDateIso: START_DATE_ISO,
     selectedDateIso: todayIso,
     daily: {},
-    measurements: {
-      neckCm: 38,
-      waistCm: 86,
-      hipCm: 95 // used for female only
-    }
+    measurements: { neckCm: 38, waistCm: 86, hipCm: 95 },
   };
 }
 
@@ -260,16 +253,13 @@ function ProgressBar({ value, target }) {
   return (
     <div className="bar">
       <div className="barFill" style={{ width: `${pct}%` }} />
-      <div className="barText">
-        {round1(value)} / {round1(target)}
-      </div>
+      <div className="barText">{round1(value)} / {round1(target)}</div>
     </div>
   );
 }
 
 export default function App() {
   const todayIso = toLocalISODate(new Date());
-
   const [state, setState] = useState(() => loadState() ?? defaultState(todayIso));
 
   useEffect(() => {
@@ -287,14 +277,11 @@ export default function App() {
   const inRange = dayIndex >= 0 && dayIndex < DAYS_TOTAL;
 
   const split = useMemo(() => {
-    const dow = ((dayIndex % 7) + 7) % 7; // 0..6
+    const dow = ((dayIndex % 7) + 7) % 7;
     return WEEK_SPLIT[dow];
   }, [dayIndex]);
 
-  const phase = useMemo(
-    () => phaseForDayIndex(clamp(dayIndex, 0, DAYS_TOTAL - 1)),
-    [dayIndex]
-  );
+  const phase = useMemo(() => phaseForDayIndex(clamp(dayIndex, 0, DAYS_TOTAL - 1)), [dayIndex]);
 
   const workout = useMemo(() => {
     if (!inRange) return workoutTemplate("rest", phase.name);
@@ -311,7 +298,7 @@ export default function App() {
     protein: 0,
     waterL: 0,
     sleepH: 0,
-    weightKg: state.profile.weightKg
+    weightKg: state.profile.weightKg,
   };
 
   const estBf = useMemo(() => {
@@ -320,7 +307,7 @@ export default function App() {
       heightCm: state.profile.heightCm,
       neckCm: state.measurements.neckCm,
       waistCm: state.measurements.waistCm,
-      hipCm: state.measurements.hipCm
+      hipCm: state.measurements.hipCm,
     });
     return round1(bf);
   }, [state.profile, state.measurements]);
@@ -338,9 +325,9 @@ export default function App() {
         ...prev.daily,
         [prev.selectedDateIso]: {
           ...(prev.daily[prev.selectedDateIso] ?? daily),
-          ...patch
-        }
-      }
+          ...patch,
+        },
+      },
     }));
   }
 
@@ -392,7 +379,29 @@ export default function App() {
           <div className="list">
             {workout.blocks.map((b, i) => (
               <div key={i} className="row">
-                <div className="rowLeft">{b.name}</div>
+                <div className="rowLeft">
+                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                    <span>{b.name}</span>
+                    {b.videoUrl && (
+                      <a
+                        href={b.videoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          fontSize: 12,
+                          color: "var(--gold)",
+                          textDecoration: "none",
+                          border: "1px solid var(--line)",
+                          padding: "4px 8px",
+                          borderRadius: 999,
+                          background: "rgba(0,0,0,0.25)",
+                        }}
+                      >
+                        Watch demo ▶
+                      </a>
+                    )}
+                  </div>
+                </div>
                 <div className="rowRight">{b.sets}</div>
               </div>
             ))}
@@ -432,50 +441,32 @@ export default function App() {
           <div className="form">
             <label>
               Calories eaten
-              <input
-                type="number"
-                value={daily.calories}
-                onChange={(e) => updateDaily({ calories: Number(e.target.value || 0) })}
-              />
+              <input type="number" value={daily.calories}
+                onChange={(e) => updateDaily({ calories: Number(e.target.value || 0) })} />
             </label>
 
             <label>
               Protein (g)
-              <input
-                type="number"
-                value={daily.protein}
-                onChange={(e) => updateDaily({ protein: Number(e.target.value || 0) })}
-              />
+              <input type="number" value={daily.protein}
+                onChange={(e) => updateDaily({ protein: Number(e.target.value || 0) })} />
             </label>
 
             <label>
               Water (L)
-              <input
-                type="number"
-                step="0.1"
-                value={daily.waterL}
-                onChange={(e) => updateDaily({ waterL: Number(e.target.value || 0) })}
-              />
+              <input type="number" step="0.1" value={daily.waterL}
+                onChange={(e) => updateDaily({ waterL: Number(e.target.value || 0) })} />
             </label>
 
             <label>
               Sleep (hours)
-              <input
-                type="number"
-                step="0.1"
-                value={daily.sleepH}
-                onChange={(e) => updateDaily({ sleepH: Number(e.target.value || 0) })}
-              />
+              <input type="number" step="0.1" value={daily.sleepH}
+                onChange={(e) => updateDaily({ sleepH: Number(e.target.value || 0) })} />
             </label>
 
             <label>
               Morning Weight (kg)
-              <input
-                type="number"
-                step="0.1"
-                value={daily.weightKg}
-                onChange={(e) => updateDaily({ weightKg: Number(e.target.value || 0) })}
-              />
+              <input type="number" step="0.1" value={daily.weightKg}
+                onChange={(e) => updateDaily({ weightKg: Number(e.target.value || 0) })} />
             </label>
           </div>
 
@@ -514,7 +505,10 @@ export default function App() {
                 type="number"
                 value={state.profile.heightCm}
                 onChange={(e) =>
-                  setState((p) => ({ ...p, profile: { ...p.profile, heightCm: Number(e.target.value || 0) } }))
+                  setState((p) => ({
+                    ...p,
+                    profile: { ...p.profile, heightCm: Number(e.target.value || 0) },
+                  }))
                 }
               />
             </label>
@@ -525,7 +519,10 @@ export default function App() {
                 type="number"
                 value={state.measurements.neckCm}
                 onChange={(e) =>
-                  setState((p) => ({ ...p, measurements: { ...p.measurements, neckCm: Number(e.target.value || 0) } }))
+                  setState((p) => ({
+                    ...p,
+                    measurements: { ...p.measurements, neckCm: Number(e.target.value || 0) },
+                  }))
                 }
               />
             </label>
@@ -536,7 +533,10 @@ export default function App() {
                 type="number"
                 value={state.measurements.waistCm}
                 onChange={(e) =>
-                  setState((p) => ({ ...p, measurements: { ...p.measurements, waistCm: Number(e.target.value || 0) } }))
+                  setState((p) => ({
+                    ...p,
+                    measurements: { ...p.measurements, waistCm: Number(e.target.value || 0) },
+                  }))
                 }
               />
             </label>
@@ -548,15 +548,16 @@ export default function App() {
                 type="number"
                 value={state.measurements.hipCm}
                 onChange={(e) =>
-                  setState((p) => ({ ...p, measurements: { ...p.measurements, hipCm: Number(e.target.value || 0) } }))
+                  setState((p) => ({
+                    ...p,
+                    measurements: { ...p.measurements, hipCm: Number(e.target.value || 0) },
+                  }))
                 }
               />
             </label>
           </div>
 
-          <div className="muted">
-            Tip: measure in the morning, relaxed. Waist at navel level.
-          </div>
+          <div className="muted">Tip: measure in the morning, relaxed. Waist at navel level.</div>
 
           <div className="footerActions">
             <button
